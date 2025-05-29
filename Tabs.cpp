@@ -16,9 +16,8 @@ int main()
 
         ImGui::SetNextWindowSize(ImVec2(300, 200)); // Set fixed window size
         ImGui::Begin("Items", nullptr, ImGuiWindowFlags_NoResize);
-        no resize
 
-            if (ImGui::BeginTabBar("MyTabBar"))
+        if (ImGui::BeginTabBar("MyTabBar"))
         {
             if (ImGui::BeginTabItem("Fruits"))
             {
