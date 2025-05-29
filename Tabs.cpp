@@ -27,8 +27,7 @@ int main()
 
                 for (const char *fruit : fruits)
                 {
-                    ImGui::Bullet();
-                    ImGui::Text("%s", fruit);
+                    ImGui::BulletText("%s", fruit);
                 }
                 ImGui::EndTabItem();
             }
@@ -41,8 +40,7 @@ int main()
 
                 for (const char *veg : vegetables)
                 {
-                    ImGui::Bullet();
-                    ImGui::Text("%s", veg);
+                    ImGui::BulletText("%s", veg);
                 }
                 ImGui::EndTabItem();
             }
@@ -55,8 +53,7 @@ int main()
 
                 for (const char *choc : chocolates)
                 {
-                    ImGui::Bullet();
-                    ImGui::Text("%s", choc);
+                    ImGui::BulletText("%s", choc);
                 }
                 ImGui::EndTabItem();
             }
@@ -69,8 +66,7 @@ int main()
 
                 for (const char *dry : dryFruits)
                 {
-                    ImGui::Bullet();
-                    ImGui::Text("%s", dry);
+                    ImGui::BulletText("%s", dry);
                 }
                 ImGui::EndTabItem();
             }
