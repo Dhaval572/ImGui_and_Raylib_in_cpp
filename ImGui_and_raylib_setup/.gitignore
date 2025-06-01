@@ -1,5 +1,2 @@
-*.exe
-*.dsym
-main
-build
-.vscode
+# Ignore all build directories
+build/

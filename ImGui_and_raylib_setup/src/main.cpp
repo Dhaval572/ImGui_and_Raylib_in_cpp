@@ -1,67 +1,64 @@
-#include <raylib.h>
+// Very simplest calculator
 #include <rlImGui.h>
 #include <imgui.h>
 
 int main()
 {
     InitWindow(800, 600, "raylib + ImGui Example");
+
     SetTargetFPS(60);
+    rlImGuiSetup(true);
 
-    const char *path = "../assets/Mahayami.png";
-    Texture2D texture = LoadTexture(path);
-    bool isLoaded = false;
+    // Font
+    ImGuiIO &io = ImGui::GetIO();
+	io.Fonts->Clear();
+	io.Fonts->AddFontFromFileTTF("assets/Fonts/Roboto-Regular.ttf", 20.0f);
+	rlImGuiReloadFonts();
 
-    const Vector2 buttonPos = {10, 10};
-    const float buttonWidth = 120.0f;
-
-    Rectangle sourceRec = {0.0f, 0.0f, (float)texture.width, (float)texture.height};
-    Rectangle destRec = {
-        GetScreenWidth() / 2.0f - 250.0f,
-        GetScreenHeight() / 2.0f - 250.0f,
-        500.0f,
-        500.0f};
-
-    rlImGuiSetup(true); 
+    // Theme
+    ImGuiStyle &style = ImGui::GetStyle();
+	style.Colors[ImGuiCol_FrameBg] = ImColor(0.22f, 0.22f, 0.22f, 1.0f);
+	style.Colors[ImGuiCol_FrameBgHovered] = ImColor(0.2f, 0.2f, 0.2f, 1.0f);
+	style.Colors[ImGuiCol_FrameBgActive] = ImColor(0.3f, 0.3f, 0.3f, 1.0f);
+	style.WindowRounding = 5.0f;
 
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(DARKGRAY);
 
-        rlImGuiBegin(); 
+        rlImGuiBegin();
 
-        ImGui::SetNextWindowPos(ImVec2(buttonPos.x, buttonPos.y));
-        ImGui::SetNextWindowSize({buttonWidth, 0}); 
+        static double num1 = 0;
+        static double num2 = 0;
+        static double result = 0;
 
-        ImGui::Begin("Texture Controls", nullptr,
-                     ImGuiWindowFlags_NoMove |
-                         ImGuiWindowFlags_NoResize |
-                         ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("Calculator");
 
-        if (isLoaded)
-        {
-            if (ImGui::Button("Unload Texture", {buttonWidth - 20, 0}))
-            {
-                UnloadTexture(texture);
-                isLoaded = false;
-            }
-        }
-        else
-        {
-            if (ImGui::Button("Load Texture", {buttonWidth - 20, 0}))
-            {
-                texture = LoadTexture(path);
-                isLoaded = true;
-                sourceRec = {0.0f, 0.0f, (float)texture.width, (float)texture.height};
-            }
-        }
+        ImGui::InputDouble("Number 1", &num1);
+        ImGui::InputDouble("Number 2", &num2);
+
+        if (ImGui::Button("Add"))
+            result = num1 + num2;
+
+        if (ImGui::Button("Substract"))
+            result = num1 - num2;
+
+        if (ImGui::Button("Divide"))
+            result = num1 / num2;
+
+        if (ImGui::Button("Multiply"))
+            result = num1 * num2;
+
+        ImGui::Text("Result: %f", result);
 
         ImGui::End();
 
-        if (isLoaded)
-            DrawTexturePro(texture, sourceRec, destRec, {0, 0}, 0.0f, RAYWHITE);
-
-        rlImGuiEnd(); 
+        rlImGuiEnd();
         EndDrawing();
     }
+
+    rlImGuiShutdown();
+    CloseWindow();
+    return 0;
 }
