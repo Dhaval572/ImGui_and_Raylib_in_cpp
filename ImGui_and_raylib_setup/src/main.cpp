@@ -1,26 +1,15 @@
-// Very simplest calculator
+// Very simplest calculator Demo
 #include <rlImGui.h>
 #include <imgui.h>
+#include "ImGuiCustomTheme.h"
 
 int main()
 {
-    InitWindow(800, 600, "raylib + ImGui Example");
+    InitWindow(800, 600, "raylib + ImGui Demo");
 
     SetTargetFPS(60);
     rlImGuiSetup(true);
-
-    // Font
-    ImGuiIO &io = ImGui::GetIO();
-	io.Fonts->Clear();
-	io.Fonts->AddFontFromFileTTF("assets/Fonts/Roboto-Regular.ttf", 20.0f);
-	rlImGuiReloadFonts();
-
-    // Theme
-    ImGuiStyle &style = ImGui::GetStyle();
-	style.Colors[ImGuiCol_FrameBg] = ImColor(0.22f, 0.22f, 0.22f, 1.0f);
-	style.Colors[ImGuiCol_FrameBgHovered] = ImColor(0.2f, 0.2f, 0.2f, 1.0f);
-	style.Colors[ImGuiCol_FrameBgActive] = ImColor(0.3f, 0.3f, 0.3f, 1.0f);
-	style.WindowRounding = 5.0f;
+    ImCustomTheme();
 
     while (!WindowShouldClose())
     {
