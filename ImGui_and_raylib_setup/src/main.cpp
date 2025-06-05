@@ -9,7 +9,7 @@ int main()
 
     SetTargetFPS(60);
     rlImGuiSetup(true);
-    ImCustomTheme("assets/Fonts/FenomenSans-SCNRegular.ttf");
+    ImCustomTheme("assets/Fonts/Roboto-Regular.ttf");
 
     while (!WindowShouldClose())
     {
