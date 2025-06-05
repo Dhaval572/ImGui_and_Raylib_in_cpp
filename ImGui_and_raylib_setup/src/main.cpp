@@ -9,7 +9,7 @@ int main()
 
     SetTargetFPS(60);
     rlImGuiSetup(true);
-    ImCustomTheme();
+    ImCustomTheme("assets/Fonts/FenomenSans-SCNRegular.ttf");
 
     while (!WindowShouldClose())
     {
