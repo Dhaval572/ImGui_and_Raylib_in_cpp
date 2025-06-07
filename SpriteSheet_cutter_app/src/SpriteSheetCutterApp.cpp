@@ -251,10 +251,12 @@ void SpriteSheetCutterApp::ExportAllFrames()
 
 	const char *savePath = tinyfd_saveFileDialog(
 		"Select folder by saving a dummy file",
-		"dummy.png", // default filename — user can just pick a folder here
+		"", // default filename — user can just pick a folder here
 		0,			 // no filters needed
 		NULL,
 		NULL);
+
+	if(!savePath) return;
 
 	std::string fullPath = savePath;
 	size_t lastSlash = fullPath.find_last_of("/\\");
@@ -268,7 +270,9 @@ void SpriteSheetCutterApp::ExportAllFrames()
 		{
 			Rectangle cropRect = GetFrameRect(r, c, (float)frameW, (float)frameH);
 			Image frameImage = ImageFromImage(fullImage, cropRect);
+
 			std::string filename = folderPath + "/frame_" + (frameIdx < 10 ? "0" : "") + std::to_string(frameIdx) + ".png";
+
 			ExportImage(frameImage, filename.c_str());
 			UnloadImage(frameImage);
 			frameIdx++;
@@ -351,7 +355,7 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 		display.position = {50, 50};
 		display.scale = 1.0f;
 	}
-	ImGui::SameLine(0.0f, 50.0f);
+	ImGui::SameLine(0.0f, 60.0f);
 	if (ImGui::Button("Fit to Window"))
 	{
 		float maxW = static_cast<float>(GetScreenWidth()) - 400.0f;
@@ -360,8 +364,8 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 		display.scale = std::min(maxW / spriteSheet.width, maxH / spriteSheet.height);
 		display.position = {50, 50};
 	}
-	ImGui::SameLine(0.0f, 50.0f);
-	if (ImGui::Button("Export All Frames"))
+	ImGui::SameLine(0.0f, 60.0f);
+	if (ImGui::Button("Save All Frames"))
 	{
 		ExportAllFrames();
 		isCropped = true;
