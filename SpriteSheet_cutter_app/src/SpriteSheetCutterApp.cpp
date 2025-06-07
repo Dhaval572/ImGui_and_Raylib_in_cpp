@@ -286,21 +286,12 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 		std::string selectedPath = GetFileFromDialog();
 		if (!selectedPath.empty())
 		{
-			// Unload previous texture
+			// Unload previous 
 			if (spriteSheet.id != 0)
 				UnloadTexture(spriteSheet);
 
-			// Load new texture
+			// Load new 
 			spriteSheet = LoadTexture(texturePath.c_str());
-
-			if (spriteSheet.id == 0)
-			{
-				ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load texture!");
-			}
-			else
-			{
-				ImGui::TextColored(ImVec4(0, 1, 0, 1), "Successfully loaded!");
-			}
 		}
 	}
 
