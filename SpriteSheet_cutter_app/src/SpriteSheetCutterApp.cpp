@@ -4,7 +4,6 @@ SpriteSheetCutterApp::SpriteSheetCutterApp()
 {
 	texturePath = "";
 	exportFailed = false;
-	isCropped = false;
 }
 
 std::string SpriteSheetCutterApp::GetFileFromDialog()
@@ -242,7 +241,7 @@ void SpriteSheetCutterApp::ExportAllFrames()
 
 	const char *savePath = tinyfd_saveFileDialog(
 		"Select folder by saving a dummy file",
-		"", // default filename — user can just pick a folder here
+		".png", // default filename — user can just pick a folder here
 		0,	// no filters needed
 		NULL,
 		NULL);
@@ -360,12 +359,6 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 	if (ImGui::Button("Save All Frames"))
 	{
 		ExportAllFrames();
-		isCropped = true;
-	}
-
-	if (isCropped)
-	{
-		ImGui::TextColored(ImVec4(0, 1, 0, 1), "Cropped image saved successfully");
 	}
 
 	ImGui::End();

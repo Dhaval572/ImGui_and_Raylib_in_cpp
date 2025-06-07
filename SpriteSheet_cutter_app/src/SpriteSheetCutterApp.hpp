@@ -48,7 +48,6 @@ private:
     GridSettings grid;
     DisplaySettings display;
     CellSelection selection;
-    bool isCropped;
     bool exportFailed;
 
     void Update();
