@@ -6,7 +6,7 @@
 #include <cmath>
 #include <algorithm>
 #include <filesystem>
-// #include <tinyfiledialogs/tinyfiledialogs.h>
+#include <tinyfiledialogs.h>
 #include "ImGuiCustomTheme.h"
 namespace fs = std::filesystem;
 
@@ -50,12 +50,12 @@ private:
     bool isCropped = false;
     bool exportFailed = false;
 
-    void Init();
     void Update();
     void Draw();
     void RenderUI(float frameW, float frameH);
     void ExportAllFrames();
     Rectangle GetFrameRect(int row, int col, float frameW, float frameH);
+    std::string GetFileFromDialog();
     void DrawGridOverlay(float frameW, float frameH);
     void DrawCellHighlight(float sheetW, float sheetH);
     void DrawEnlargedPreview(float frameW, float frameH);

@@ -5,25 +5,21 @@ SpriteSheetCutterApp::SpriteSheetCutterApp()
 	texturePath = "assets/Plant1_Idle_body.png";
 }
 
-SpriteSheetCutterApp::~SpriteSheetCutterApp()
-{
-	rlImGuiShutdown();
-	if (spriteSheet.id != 0)
-		UnloadTexture(spriteSheet);
-	CloseWindow();
-}
+// std::string SpriteSheetCutterApp::GetFileFromDialog()
+// {
+// 	const char *fileTypes[] = {"*.png", "*.jpg", "*.jpeg", "*.bmp"};
+
+// 	const char *selectedPath = tinyfd_openFileDialog(
+// 		"Select an image", // title
+// 		"",				   // default path
+// 		4,				   // number of filters
+// 		fileTypes,		   // C-style array of filters
+// 		"Image files",	   // filter description
+// 		0				   // allow multiple selection? 0 = no
+// 	);
+// }
 
 void SpriteSheetCutterApp::run()
-{
-	Init();
-	while (!WindowShouldClose())
-	{
-		Update();
-		Draw();
-	}
-}
-
-void SpriteSheetCutterApp::Init()
 {
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 	InitWindow(800, 600, "Ultra-Accurate Sprite Sheet Splitter");
@@ -31,6 +27,11 @@ void SpriteSheetCutterApp::Init()
 	spriteSheet = LoadTexture(texturePath.c_str());
 	rlImGuiSetup(true);
 	ImCustomTheme();
+	while (!WindowShouldClose())
+	{
+		Update();
+		Draw();
+	}
 }
 
 void SpriteSheetCutterApp::Update()
@@ -314,4 +315,12 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 	}
 
 	ImGui::End();
+}
+
+SpriteSheetCutterApp::~SpriteSheetCutterApp()
+{
+	rlImGuiShutdown();
+	if (spriteSheet.id != 0)
+		UnloadTexture(spriteSheet);
+	CloseWindow();
 }
