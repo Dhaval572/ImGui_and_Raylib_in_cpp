@@ -2,29 +2,39 @@
 
 SpriteSheetCutterApp::SpriteSheetCutterApp()
 {
-	texturePath = "assets/Plant1_Idle_body.png";
+	texturePath = "";
+	exportFailed = false;
+	isCropped = false;
 }
 
-// std::string SpriteSheetCutterApp::GetFileFromDialog()
-// {
-// 	const char *fileTypes[] = {"*.png", "*.jpg", "*.jpeg", "*.bmp"};
+std::string SpriteSheetCutterApp::GetFileFromDialog()
+{
+	static const char *fileTypes[] = {"*.png", "*.jpg", "*.jpeg", "*.bmp"};
 
-// 	const char *selectedPath = tinyfd_openFileDialog(
-// 		"Select an image", // title
-// 		"",				   // default path
-// 		4,				   // number of filters
-// 		fileTypes,		   // C-style array of filters
-// 		"Image files",	   // filter description
-// 		0				   // allow multiple selection? 0 = no
-// 	);
-// }
+	const char *result = tinyfd_openFileDialog(
+		"Select an image",
+		"",
+		4,
+		fileTypes,
+		"Image files",
+		0);
+
+	if (result != nullptr)
+	{
+		texturePath = std::string(result);
+		return texturePath;
+	}
+	else
+	{
+		return "";
+	}
+}
 
 void SpriteSheetCutterApp::run()
 {
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 	InitWindow(800, 600, "Ultra-Accurate Sprite Sheet Splitter");
 	SetTargetFPS(60);
-	spriteSheet = LoadTexture(texturePath.c_str());
 	rlImGuiSetup(true);
 	ImCustomTheme();
 	while (!WindowShouldClose())
@@ -71,12 +81,29 @@ void SpriteSheetCutterApp::Draw()
 	}
 	else
 	{
-		ImGui::Begin("Error");
-		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Texture failed to load!");
-		ImGui::Text("Path: %s", texturePath.c_str());
-		if (ImGui::Button("Retry"))
-			spriteSheet = LoadTexture(texturePath.c_str());
-		ImGui::End();
+		if (ImGui::Button("Load Sprite"))
+		{
+			std::string selectedPath = GetFileFromDialog();
+			if (!selectedPath.empty())
+			{
+				spriteSheet = LoadTexture(texturePath.c_str());
+
+				if (spriteSheet.id == 0)
+				{
+					ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load texture!");
+				}
+				else
+				{
+					ImGui::TextColored(ImVec4(0, 1, 0, 1), "Successfully loaded!");
+				}
+			}
+		}
+
+		if (!texturePath.empty() && spriteSheet.id == 0)
+		{
+			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load texture!");
+			ImGui::Text("Path: %s", texturePath.c_str());
+		}
 	}
 
 	rlImGuiEnd();
@@ -226,7 +253,7 @@ void SpriteSheetCutterApp::ExportAllFrames()
 	if (!fs::exists(folderPath))
 		fs::create_directories(folderPath);
 
-	static uint8_t frameIdx = 0;
+	uint8_t frameIdx = 0;
 
 	for (int r = 0; r < grid.rows; r++)
 	{
@@ -249,6 +276,32 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 	ImGui::Begin("Ultra-Accurate Sprite Sheet Splitter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
 	ImGui::Text("Sprite Sheet: %dx%d pixels", spriteSheet.width, spriteSheet.height);
+
+	ImGui::SameLine(0.0f, 80.0f);
+
+	if (ImGui::Button("Load new SpriteSheet"))
+	{
+		std::string selectedPath = GetFileFromDialog();
+		if (!selectedPath.empty())
+		{
+			// Unload previous texture
+			if (spriteSheet.id != 0)
+				UnloadTexture(spriteSheet);
+
+			// Load new texture
+			spriteSheet = LoadTexture(texturePath.c_str());
+
+			if (spriteSheet.id == 0)
+			{
+				ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load texture!");
+			}
+			else
+			{
+				ImGui::TextColored(ImVec4(0, 1, 0, 1), "Successfully loaded!");
+			}
+		}
+	}
+
 	ImGui::Checkbox("Snap to Pixels", &display.snapToPixels);
 	ImGui::SameLine();
 	ImGui::Checkbox("Show Cell Info", &display.showCellInfo);
@@ -291,7 +344,7 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 		display.position = {50, 50};
 		display.scale = 1.0f;
 	}
-	ImGui::SameLine();
+	ImGui::SameLine(0.0f, 50.0f);
 	if (ImGui::Button("Fit to Window"))
 	{
 		float maxW = static_cast<float>(GetScreenWidth()) - 400.0f;
@@ -300,7 +353,7 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 		display.scale = std::min(maxW / spriteSheet.width, maxH / spriteSheet.height);
 		display.position = {50, 50};
 	}
-	ImGui::SameLine();
+	ImGui::SameLine(0.0f, 50.0f);
 	if (ImGui::Button("Export All Frames"))
 	{
 		ExportAllFrames();
@@ -309,9 +362,7 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 
 	if (isCropped)
 	{
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1)); // Green
-		ImGui::TextWrapped("Cropped image saved successfully");
-		ImGui::PopStyleColor();
+		ImGui::TextColored(ImVec4(0, 1, 0, 1), "Cropped image saved successfully");
 	}
 
 	ImGui::End();
