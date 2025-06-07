@@ -1,0 +1,317 @@
+#include "SpriteSheetCutterApp.hpp"
+
+SpriteSheetCutterApp::SpriteSheetCutterApp()
+{
+	texturePath = "assets/Plant1_Idle_body.png";
+}
+
+SpriteSheetCutterApp::~SpriteSheetCutterApp()
+{
+	rlImGuiShutdown();
+	if (spriteSheet.id != 0)
+		UnloadTexture(spriteSheet);
+	CloseWindow();
+}
+
+void SpriteSheetCutterApp::run()
+{
+	Init();
+	while (!WindowShouldClose())
+	{
+		Update();
+		Draw();
+	}
+}
+
+void SpriteSheetCutterApp::Init()
+{
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+	InitWindow(800, 600, "Ultra-Accurate Sprite Sheet Splitter");
+	SetTargetFPS(60);
+	spriteSheet = LoadTexture(texturePath.c_str());
+	rlImGuiSetup(true);
+	ImCustomTheme();
+}
+
+void SpriteSheetCutterApp::Update()
+{
+	if (display.snapToPixels)
+	{
+		display.position.x = floorf(display.position.x);
+		display.position.y = floorf(display.position.y);
+	}
+}
+
+void SpriteSheetCutterApp::Draw()
+{
+	float frameW = spriteSheet.width / (float)grid.columns;
+	float frameH = spriteSheet.height / (float)grid.rows;
+
+	BeginDrawing();
+	ClearBackground(Color{32, 32, 32, 255});
+
+	if (spriteSheet.id != 0)
+	{
+		SetTextureFilter(spriteSheet, TEXTURE_FILTER_POINT);
+		DrawTexturePro(spriteSheet, {0, 0, (float)spriteSheet.width, (float)spriteSheet.height},
+					   {display.position.x, display.position.y, spriteSheet.width * display.scale, spriteSheet.height * display.scale},
+					   {0, 0}, 0.0f, WHITE);
+
+		DrawGridOverlay(frameW, frameH);
+		DrawCellHighlight(frameW, frameH);
+		DrawEnlargedPreview(frameW, frameH);
+	}
+
+	rlImGuiBegin();
+
+	if (spriteSheet.id != 0)
+	{
+		RenderUI(frameW, frameH);
+	}
+	else
+	{
+		ImGui::Begin("Error");
+		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Texture failed to load!");
+		ImGui::Text("Path: %s", texturePath.c_str());
+		if (ImGui::Button("Retry"))
+			spriteSheet = LoadTexture(texturePath.c_str());
+		ImGui::End();
+	}
+
+	rlImGuiEnd();
+	EndDrawing();
+}
+
+Rectangle SpriteSheetCutterApp::GetFrameRect(int row, int col, float frameW, float frameH)
+{
+	return Rectangle{col * frameW, row * frameH, frameW, frameH};
+}
+
+void SpriteSheetCutterApp::DrawGridOverlay(float frameW, float frameH)
+{
+	if (!grid.showGrid || grid.rows < 1 || grid.columns < 1)
+		return;
+
+	float displayW = spriteSheet.width * display.scale;
+	float displayH = spriteSheet.height * display.scale;
+	float gridX = displayW / grid.columns;
+	float gridY = displayH / grid.rows;
+
+	for (int c = 0; c <= grid.columns; c++)
+	{
+		float x = display.position.x + c * gridX;
+		if (display.snapToPixels)
+			x = roundf(x);
+
+		float thickness = (c == 0 || c == grid.columns) ? grid.lineThickness + 1 : grid.lineThickness;
+		Color color = (c == 0 || c == grid.columns) ? YELLOW : WHITE;
+		DrawLineEx({x, display.position.y}, {x, display.position.y + displayH}, thickness, color);
+	}
+
+	for (int r = 0; r <= grid.rows; r++)
+	{
+		float y = display.position.y + r * gridY;
+		if (display.snapToPixels)
+			y = roundf(y);
+
+		float thickness = (r == 0 || r == grid.rows) ? grid.lineThickness + 1 : grid.lineThickness;
+		Color color = (r == 0 || r == grid.rows) ? YELLOW : WHITE;
+		DrawLineEx({display.position.x, y}, {display.position.x + displayW, y}, thickness, color);
+	}
+
+	if (display.showCellInfo)
+	{
+		for (int r = 0; r < grid.rows; r++)
+		{
+			for (int c = 0; c < grid.columns; c++)
+			{
+				int cellNumber = r * grid.columns + c;
+				float x = display.position.x + c * gridX + 5;
+				float y = display.position.y + r * gridY + 5;
+				DrawText(TextFormat("%d", cellNumber), (int)x, (int)y, 12, LIGHTGRAY);
+			}
+		}
+	}
+}
+
+void SpriteSheetCutterApp::DrawCellHighlight(float sheetW, float sheetH)
+{
+	if (grid.rows <= 0 || grid.columns <= 0)
+		return;
+
+	float gridX = (spriteSheet.width * display.scale) / grid.columns;
+	float gridY = (spriteSheet.height * display.scale) / grid.rows;
+	float x = display.position.x + selection.col * gridX;
+	float y = display.position.y + selection.row * gridY;
+
+	if (display.snapToPixels)
+	{
+		x = roundf(x);
+		y = roundf(y);
+		gridX = roundf(gridX);
+		gridY = roundf(gridY);
+	}
+
+	Rectangle highlight = {x, y, gridX, gridY};
+	static float alpha = 0.0f;
+	alpha += 0.05f;
+	if (alpha > 1.0f)
+		alpha = 0.0f;
+
+	DrawRectangleRec(highlight, Color{255, 0, 0, (unsigned char)(50 + 50 * sinf(alpha * 6.28f))});
+	DrawRectangleLinesEx(highlight, 3.0f, RED);
+
+	float markerSize = 8.0f;
+
+	DrawRectangle((int)(x - markerSize / 2), (int)(y - markerSize / 2), (int)markerSize, (int)markerSize, RED);
+	DrawRectangle((int)(x + gridX - markerSize / 2), (int)(y - markerSize / 2), (int)markerSize, (int)markerSize, RED);
+	DrawRectangle((int)(x - markerSize / 2), (int)(y + gridY - markerSize / 2), (int)markerSize, (int)markerSize, RED);
+	DrawRectangle((int)(x + gridX - markerSize / 2), (int)(y + gridY - markerSize / 2), (int)markerSize, (int)markerSize, RED);
+}
+
+void SpriteSheetCutterApp::DrawEnlargedPreview(float frameW, float frameH)
+{
+	Rectangle src = GetFrameRect(selection.row, selection.col, frameW, frameH);
+	float previewW = frameW * display.previewScale;
+	float previewH = frameH * display.previewScale;
+	float previewX = GetScreenWidth() - previewW - 50;
+	float previewY = GetScreenHeight() - previewH - 50;
+
+	if (display.snapToPixels)
+	{
+		previewX = roundf(previewX);
+		previewY = roundf(previewY);
+		previewW = roundf(previewW);
+		previewH = roundf(previewH);
+	}
+
+	Rectangle dest = {previewX, previewY, previewW, previewH};
+	DrawRectangleRec(dest, Color{0, 0, 0, 200});
+	DrawTexturePro(spriteSheet, src, dest, {0, 0}, 0.0f, WHITE);
+	DrawRectangleLinesEx(dest, 3.0f, GREEN);
+	DrawText(TextFormat("Preview: Cell %d (%.1fx%.1f)", selection.index, frameW, frameH),
+			 (int)previewX, (int)(previewY - 25), 16, GREEN);
+}
+
+void SpriteSheetCutterApp::ExportAllFrames()
+{
+	Image fullImage = LoadImage(texturePath.c_str());
+
+	if (fullImage.data == nullptr)
+	{
+		exportFailed = true;
+	}
+
+	if (exportFailed)
+		ImGui::OpenPopup("Export Failed");
+
+	if (ImGui::BeginPopupModal("Export Failed", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load image for export!");
+		ImGui::Text("Check if the file exists at:\n%s", texturePath.c_str());
+		ImGui::Separator();
+		if (ImGui::Button("OK"))
+		{
+			exportFailed = false;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::EndPopup();
+	}
+
+	int frameW = spriteSheet.width / grid.columns;
+	int frameH = spriteSheet.height / grid.rows;
+
+	const char *folderPath = "assets/New Folder";
+	if (!fs::exists(folderPath))
+		fs::create_directories(folderPath);
+
+	static uint8_t frameIdx = 0;
+
+	for (int r = 0; r < grid.rows; r++)
+	{
+		for (int c = 0; c < grid.columns; c++)
+		{
+			Rectangle cropRect = GetFrameRect(r, c, (float)frameW, (float)frameH);
+			Image frameImage = ImageFromImage(fullImage, cropRect);
+			std::string filename = TextFormat("%s/frame_%02d.png", folderPath, frameIdx);
+			ExportImage(frameImage, filename.c_str());
+			UnloadImage(frameImage);
+			frameIdx++;
+		}
+	}
+
+	UnloadImage(fullImage);
+}
+
+void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
+{
+	ImGui::Begin("Ultra-Accurate Sprite Sheet Splitter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+	ImGui::Text("Sprite Sheet: %dx%d pixels", spriteSheet.width, spriteSheet.height);
+	ImGui::Checkbox("Snap to Pixels", &display.snapToPixels);
+	ImGui::SameLine();
+	ImGui::Checkbox("Show Cell Info", &display.showCellInfo);
+	ImGui::SliderFloat("Grid Line Thickness", &grid.lineThickness, 0.5f, 5.0f);
+
+	if (ImGui::InputInt("Rows", &grid.rows))
+		grid.rows = std::max(1, grid.rows);
+
+	if (ImGui::InputInt("Columns", &grid.columns))
+		grid.columns = std::max(1, grid.columns);
+
+	ImGui::Checkbox("Show Grid", &grid.showGrid);
+	ImGui::SliderFloat("Main Scale", &display.scale, 1.0f, 3.0f);
+	ImGui::SliderFloat("Preview Scale", &display.previewScale, 1.0f, 10.0f);
+	ImGui::DragFloat2("Position", (float *)&display.position, 1.0f, 0.0f, 0.0f, "%.1f");
+
+	int totalCells = grid.rows * grid.columns;
+	selection.index = std::clamp(selection.index, 0, totalCells - 1);
+	selection.row = selection.index / grid.columns;
+	selection.col = selection.index % grid.columns;
+
+	if (ImGui::SliderInt("Select Cell", &selection.index, 0, totalCells - 1))
+	{
+		selection.row = selection.index / grid.columns;
+		selection.col = selection.index % grid.columns;
+	}
+	if (ImGui::SliderInt("Row", &selection.row, 0, grid.rows - 1))
+		selection.index = selection.row * grid.columns + selection.col;
+
+	if (ImGui::SliderInt("Column", &selection.col, 0, grid.columns - 1))
+		selection.index = selection.row * grid.columns + selection.col;
+
+	ImGui::Text("Cell: %d (Row %d, Col %d)", selection.index, selection.row, selection.col);
+	ImGui::Text("Frame: %.1f x %.1f", frameW, frameH);
+	ImGui::Text("Display: %.1f x %.1f", frameW * display.scale, frameH * display.scale);
+	ImGui::Text("Tex Coords: (%.1f, %.1f)", selection.col * frameW, selection.row * frameH);
+
+	if (ImGui::Button("Reset Position"))
+	{
+		display.position = {50, 50};
+		display.scale = 1.0f;
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Fit to Window"))
+	{
+		float maxW = static_cast<float>(GetScreenWidth()) - 400.0f;
+		float maxH = static_cast<float>(GetScreenHeight()) - 100.0f;
+
+		display.scale = std::min(maxW / spriteSheet.width, maxH / spriteSheet.height);
+		display.position = {50, 50};
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Export All Frames"))
+	{
+		ExportAllFrames();
+		isCropped = true;
+	}
+
+	if (isCropped)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1)); // Green
+		ImGui::TextWrapped("Cropped image saved successfully");
+		ImGui::PopStyleColor();
+	}
+
+	ImGui::End();
+}
