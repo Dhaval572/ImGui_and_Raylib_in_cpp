@@ -249,9 +249,16 @@ void SpriteSheetCutterApp::ExportAllFrames()
 	int frameW = spriteSheet.width / grid.columns;
 	int frameH = spriteSheet.height / grid.rows;
 
-	const char *folderPath = "assets/New Folder";
-	if (!fs::exists(folderPath))
-		fs::create_directories(folderPath);
+	const char *savePath = tinyfd_saveFileDialog(
+		"Select folder by saving a dummy file",
+		"dummy.png", // default filename — user can just pick a folder here
+		0,			 // no filters needed
+		NULL,
+		NULL);
+
+	std::string fullPath = savePath;
+	size_t lastSlash = fullPath.find_last_of("/\\");
+	std::string folderPath = (lastSlash == std::string::npos) ? "." : fullPath.substr(0, lastSlash);
 
 	uint8_t frameIdx = 0;
 
@@ -261,7 +268,7 @@ void SpriteSheetCutterApp::ExportAllFrames()
 		{
 			Rectangle cropRect = GetFrameRect(r, c, (float)frameW, (float)frameH);
 			Image frameImage = ImageFromImage(fullImage, cropRect);
-			std::string filename = TextFormat("%s/frame_%02d.png", folderPath, frameIdx);
+			std::string filename = folderPath + "/frame_" + (frameIdx < 10 ? "0" : "") + std::to_string(frameIdx) + ".png";
 			ExportImage(frameImage, filename.c_str());
 			UnloadImage(frameImage);
 			frameIdx++;

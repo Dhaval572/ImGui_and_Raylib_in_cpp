@@ -6,6 +6,7 @@
 #include <cmath>
 #include <algorithm>
 #include <filesystem>
+#include <format>
 #include <tinyfiledialogs.h>
 #include "ImGuiCustomTheme.h"
 namespace fs = std::filesystem;
