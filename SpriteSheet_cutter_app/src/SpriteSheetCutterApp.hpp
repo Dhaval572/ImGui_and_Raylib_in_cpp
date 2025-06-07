@@ -53,7 +53,7 @@ private:
     void Update();
     void Draw();
     void RenderUI(float frameW, float frameH);
-    void ExportAllFrames();
+    void ExportAllFrames(char *destFileName);
     Rectangle GetFrameRect(int row, int col, float frameW, float frameH);
     std::string GetFileFromDialog();
     void DrawGridOverlay(float frameW, float frameH);

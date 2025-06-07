@@ -115,20 +115,22 @@ void SpriteSheetCutterApp::DrawGridOverlay(float frameW, float frameH)
 	float gridX = displayW / grid.columns;
 	float gridY = displayH / grid.rows;
 
-	for (int c = 0; c <= grid.columns; c++)
+	for (uint8_t c = 0; c <= grid.columns; c++)
 	{
 		float x = display.position.x + c * gridX;
 		if (display.snapToPixels)
 			x = roundf(x);
 
 		float thickness = (c == 0 || c == grid.columns) ? grid.lineThickness + 1 : grid.lineThickness;
+
 		Color color = (c == 0 || c == grid.columns) ? YELLOW : WHITE;
 		DrawLineEx({x, display.position.y}, {x, display.position.y + displayH}, thickness, color);
 	}
 
-	for (int r = 0; r <= grid.rows; r++)
+	for (uint8_t r = 0; r <= grid.rows; r++)
 	{
 		float y = display.position.y + r * gridY;
+
 		if (display.snapToPixels)
 			y = roundf(y);
 
@@ -139,14 +141,14 @@ void SpriteSheetCutterApp::DrawGridOverlay(float frameW, float frameH)
 
 	if (display.showCellInfo)
 	{
-		for (int r = 0; r < grid.rows; r++)
+		for (uint8_t r = 0; r < grid.rows; r++)
 		{
-			for (int c = 0; c < grid.columns; c++)
+			for (uint8_t c = 0; c < grid.columns; c++)
 			{
 				int cellNumber = r * grid.columns + c;
 				float x = display.position.x + c * gridX + 5;
 				float y = display.position.y + r * gridY + 5;
-				DrawText(TextFormat("%d", cellNumber), (int)x, (int)y, 12, LIGHTGRAY);
+				DrawText(TextFormat("%d", cellNumber), static_cast<int>(x), static_cast<int>(y), 12, LIGHTGRAY);
 			}
 		}
 	}
@@ -176,7 +178,7 @@ void SpriteSheetCutterApp::DrawCellHighlight(float sheetW, float sheetH)
 	if (alpha > 1.0f)
 		alpha = 0.0f;
 
-	DrawRectangleRec(highlight, Color{255, 0, 0, (unsigned char)(50 + 50 * sinf(alpha * 6.28f))});
+	DrawRectangleRec(highlight, Color{255, 0, 0, static_cast<unsigned char>(50 + 50 * sinf(alpha * 6.28f))});
 	DrawRectangleLinesEx(highlight, 3.0f, RED);
 
 	float markerSize = 8.0f;
@@ -208,10 +210,10 @@ void SpriteSheetCutterApp::DrawEnlargedPreview(float frameW, float frameH)
 	DrawTexturePro(spriteSheet, src, dest, {0, 0}, 0.0f, WHITE);
 	DrawRectangleLinesEx(dest, 3.0f, GREEN);
 	DrawText(TextFormat("Preview: Cell %d (%.1fx%.1f)", selection.index, frameW, frameH),
-			 (int)previewX, (int)(previewY - 25), 16, GREEN);
+			 static_cast<int>(previewX), static_cast<int>(previewY - 25), 16, GREEN);
 }
 
-void SpriteSheetCutterApp::ExportAllFrames()
+void SpriteSheetCutterApp::ExportAllFrames(char *destFileName)
 {
 	Image fullImage = LoadImage(texturePath.c_str());
 
@@ -241,8 +243,8 @@ void SpriteSheetCutterApp::ExportAllFrames()
 
 	const char *savePath = tinyfd_saveFileDialog(
 		"Select folder by saving a dummy file",
-		".png", // default filename — user can just pick a folder here
-		0,	// no filters needed
+		".png",
+		0,
 		NULL,
 		NULL);
 
@@ -255,14 +257,14 @@ void SpriteSheetCutterApp::ExportAllFrames()
 
 	uint8_t frameIdx = 0;
 
-	for (int r = 0; r < grid.rows; r++)
+	for (uint8_t r = 0; r < grid.rows; r++)
 	{
-		for (int c = 0; c < grid.columns; c++)
+		for (uint8_t c = 0; c < grid.columns; c++)
 		{
-			Rectangle cropRect = GetFrameRect(r, c, (float)frameW, (float)frameH);
+			Rectangle cropRect = GetFrameRect(r, c, static_cast<float>(frameW), static_cast<float>(frameH));
 			Image frameImage = ImageFromImage(fullImage, cropRect);
 
-			std::string filename = folderPath + "/frame_" + (frameIdx < 10 ? "0" : "") + std::to_string(frameIdx) + ".png";
+			std::string filename = folderPath + "/" + destFileName + (frameIdx < 10 ? "0" : "") + std::to_string(frameIdx) + ".png";
 
 			ExportImage(frameImage, filename.c_str());
 			UnloadImage(frameImage);
@@ -275,6 +277,9 @@ void SpriteSheetCutterApp::ExportAllFrames()
 
 void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 {
+	static bool save = false;
+	static bool showInputBox = false;
+	static char destFileName[256] = "";
 	ImGui::Begin("Ultra-Accurate Sprite Sheet Splitter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
 	ImGui::Text("Sprite Sheet: %dx%d pixels", spriteSheet.width, spriteSheet.height);
@@ -286,11 +291,11 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 		std::string selectedPath = GetFileFromDialog();
 		if (!selectedPath.empty())
 		{
-			// Unload previous 
+			// Unload previous
 			if (spriteSheet.id != 0)
 				UnloadTexture(spriteSheet);
 
-			// Load new 
+			// Load new
 			spriteSheet = LoadTexture(texturePath.c_str());
 		}
 	}
@@ -349,7 +354,27 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 	ImGui::SameLine(0.0f, 60.0f);
 	if (ImGui::Button("Save All Frames"))
 	{
-		ExportAllFrames();
+		showInputBox = true;
+	}
+
+	if (showInputBox)
+	{
+		ImGui::InputText("Name of the file:", destFileName, IM_ARRAYSIZE(destFileName));
+
+		if (ImGui::Button("Confirm Save"))
+		{
+			if (strlen(destFileName) > 0)
+			{
+				save = true;
+				showInputBox = false;
+			}
+		}
+	}
+
+	if (save)
+	{
+		ExportAllFrames(destFileName);
+		save = false;
 	}
 
 	ImGui::End();
