@@ -23,17 +23,14 @@ std::string SpriteSheetCutterApp::GetFileFromDialog()
 		texturePath = std::string(result);
 		return texturePath;
 	}
-	else
-	{
-		return "";
-	}
+	return "";
 }
 
 void SpriteSheetCutterApp::run()
 {
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 	InitWindow(1200, 700, "Ultra-Accurate Sprite Sheet Splitter");
-	SetTargetFPS(60);
+	SetTargetFPS(120);
 	rlImGuiSetup(true);
 	ImCustomTheme();
 	while (!WindowShouldClose())
@@ -54,16 +51,16 @@ void SpriteSheetCutterApp::Update()
 
 void SpriteSheetCutterApp::Draw()
 {
-	float frameW = spriteSheet.width / (float)grid.columns;
-	float frameH = spriteSheet.height / (float)grid.rows;
+	float frameW = spriteSheet.width / static_cast<float>(grid.columns);
+	float frameH = spriteSheet.height / static_cast<float>(grid.rows);
 
 	BeginDrawing();
-	ClearBackground(Color{32, 32, 32, 255});
+	ClearBackground(GRAY);
 
 	if (spriteSheet.id != 0)
 	{
 		SetTextureFilter(spriteSheet, TEXTURE_FILTER_POINT);
-		DrawTexturePro(spriteSheet, {0, 0, (float)spriteSheet.width, (float)spriteSheet.height},
+		DrawTexturePro(spriteSheet, {0, 0, static_cast<float>(spriteSheet.width), static_cast<float>(spriteSheet.height)},
 					   {display.position.x, display.position.y, spriteSheet.width * display.scale, spriteSheet.height * display.scale},
 					   {0, 0}, 0.0f, WHITE);
 
@@ -174,6 +171,7 @@ void SpriteSheetCutterApp::DrawCellHighlight(float sheetW, float sheetH)
 
 	Rectangle highlight = {x, y, gridX, gridY};
 	static float alpha = 0.0f;
+
 	alpha += 0.05f;
 	if (alpha > 1.0f)
 		alpha = 0.0f;
@@ -183,10 +181,14 @@ void SpriteSheetCutterApp::DrawCellHighlight(float sheetW, float sheetH)
 
 	float markerSize = 8.0f;
 
-	DrawRectangle((int)(x - markerSize / 2), (int)(y - markerSize / 2), (int)markerSize, (int)markerSize, RED);
-	DrawRectangle((int)(x + gridX - markerSize / 2), (int)(y - markerSize / 2), (int)markerSize, (int)markerSize, RED);
-	DrawRectangle((int)(x - markerSize / 2), (int)(y + gridY - markerSize / 2), (int)markerSize, (int)markerSize, RED);
-	DrawRectangle((int)(x + gridX - markerSize / 2), (int)(y + gridY - markerSize / 2), (int)markerSize, (int)markerSize, RED);
+	// Alternative of too much type casting
+	auto i = [](float f)
+	{ return static_cast<int>(f); };
+
+	DrawRectangle(i(x - markerSize / 2), i(y - markerSize / 2), i(markerSize), i(markerSize), RED);
+	DrawRectangle(i(x + gridX - markerSize / 2), i(y - markerSize / 2), i(markerSize), i(markerSize), RED);
+	DrawRectangle(i(x - markerSize / 2), i(y + gridY - markerSize / 2), i(markerSize), i(markerSize), RED);
+	DrawRectangle(i(x + gridX - markerSize / 2), i(y + gridY - markerSize / 2), i(markerSize), i(markerSize), RED);
 }
 
 void SpriteSheetCutterApp::DrawEnlargedPreview(float frameW, float frameH)
@@ -283,9 +285,7 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 	ImGui::Begin("Ultra-Accurate Sprite Sheet Splitter", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
 	ImGui::Text("Sprite Sheet: %dx%d pixels", spriteSheet.width, spriteSheet.height);
-
 	ImGui::SameLine(0.0f, 80.0f);
-
 	if (ImGui::Button("Load new SpriteSheet"))
 	{
 		std::string selectedPath = GetFileFromDialog();
@@ -346,7 +346,7 @@ void SpriteSheetCutterApp::RenderUI(float frameW, float frameH)
 	if (ImGui::Button("Fit to Window"))
 	{
 		float maxW = static_cast<float>(GetScreenWidth()) - 400.0f;
-		float maxH = static_cast<float>(GetScreenHeight()) - 100.0f;
+		float maxH = static_cast<float>(GetScreenHeight()) - 150.0f;
 
 		display.scale = std::min(maxW / spriteSheet.width, maxH / spriteSheet.height);
 		display.position = {50, 50};
