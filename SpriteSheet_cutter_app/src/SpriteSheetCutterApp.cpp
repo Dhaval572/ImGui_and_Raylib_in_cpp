@@ -87,21 +87,12 @@ void SpriteSheetCutterApp::Draw()
 			if (!selectedPath.empty())
 			{
 				spriteSheet = LoadTexture(texturePath.c_str());
-
-				if (spriteSheet.id == 0)
-				{
-					ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load texture!");
-				}
-				else
-				{
-					ImGui::TextColored(ImVec4(0, 1, 0, 1), "Successfully loaded!");
-				}
 			}
 		}
 
 		if (!texturePath.empty() && spriteSheet.id == 0)
 		{
-			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load texture!");
+			ImGui::TextColored(ImVec4(1, 0, 0, 1), "Failed to load texture! Only Choose Image files");
 			ImGui::Text("Path: %s", texturePath.c_str());
 		}
 	}
@@ -252,11 +243,12 @@ void SpriteSheetCutterApp::ExportAllFrames()
 	const char *savePath = tinyfd_saveFileDialog(
 		"Select folder by saving a dummy file",
 		"", // default filename — user can just pick a folder here
-		0,			 // no filters needed
+		0,	// no filters needed
 		NULL,
 		NULL);
 
-	if(!savePath) return;
+	if (!savePath)
+		return;
 
 	std::string fullPath = savePath;
 	size_t lastSlash = fullPath.find_last_of("/\\");
