@@ -145,7 +145,7 @@ void SpriteSheetCutterApp::DrawGridOverlay(float frameW, float frameH)
 				int cellNumber = r * grid.columns + c;
 				float x = display.position.x + c * gridX + 5;
 				float y = display.position.y + r * gridY + 5;
-				DrawText(TextFormat("%d", cellNumber), static_cast<int>(x), static_cast<int>(y), 12, LIGHTGRAY);
+				DrawText(TextFormat("%d", cellNumber), f2i(x), f2i(y), 12, LIGHTGRAY);
 			}
 		}
 	}
@@ -182,13 +182,11 @@ void SpriteSheetCutterApp::DrawCellHighlight(float sheetW, float sheetH)
 	float markerSize = 8.0f;
 
 	// Alternative of too much type casting
-	auto i = [](float f)
-	{ return static_cast<int>(f); };
 
-	DrawRectangle(i(x - markerSize / 2), i(y - markerSize / 2), i(markerSize), i(markerSize), RED);
-	DrawRectangle(i(x + gridX - markerSize / 2), i(y - markerSize / 2), i(markerSize), i(markerSize), RED);
-	DrawRectangle(i(x - markerSize / 2), i(y + gridY - markerSize / 2), i(markerSize), i(markerSize), RED);
-	DrawRectangle(i(x + gridX - markerSize / 2), i(y + gridY - markerSize / 2), i(markerSize), i(markerSize), RED);
+	DrawRectangle(f2i(x - markerSize / 2), f2i(y - markerSize / 2), f2i(markerSize), f2i(markerSize), RED);
+	DrawRectangle(f2i(x + gridX - markerSize / 2), f2i(y - markerSize / 2), f2i(markerSize), f2i(markerSize), RED);
+	DrawRectangle(f2i(x - markerSize / 2), f2i(y + gridY - markerSize / 2), f2i(markerSize), f2i(markerSize), RED);
+	DrawRectangle(f2i(x + gridX - markerSize / 2), f2i(y + gridY - markerSize / 2), f2i(markerSize), f2i(markerSize), RED);
 }
 
 void SpriteSheetCutterApp::DrawEnlargedPreview(float frameW, float frameH)
@@ -212,7 +210,7 @@ void SpriteSheetCutterApp::DrawEnlargedPreview(float frameW, float frameH)
 	DrawTexturePro(spriteSheet, src, dest, {0, 0}, 0.0f, WHITE);
 	DrawRectangleLinesEx(dest, 3.0f, GREEN);
 	DrawText(TextFormat("Preview: Cell %d (%.1fx%.1f)", selection.index, frameW, frameH),
-			 static_cast<int>(previewX), static_cast<int>(previewY - 25), 16, GREEN);
+			 f2i(previewX), f2i(previewY - 25), 16, GREEN);
 }
 
 void SpriteSheetCutterApp::ExportAllFrames(char *destFileName)

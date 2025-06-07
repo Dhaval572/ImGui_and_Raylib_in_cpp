@@ -11,6 +11,10 @@
 #include "ImGuiCustomTheme.h"
 namespace fs = std::filesystem;
 
+// For make typecasting easy
+inline constexpr auto f2i = [](float f)
+{ return static_cast<int>(f); };
+
 struct GridSettings
 {
     int rows = 1;
