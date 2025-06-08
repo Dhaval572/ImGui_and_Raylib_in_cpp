@@ -1,14 +1,11 @@
 // YouTube video downloader
-#include <iostream>
+#include <rlImGui.h>
+#include <imgui.h>
 #include <string>
-#include <cstdlib>
 #include <algorithm>
 #include <limits>
 #include <thread>
 #include <atomic>
-#include <raylib.h>
-#include <rlImGui.h>
-#include <imgui.h>
 #include "tinyfiledialogs.h"
 #include "ImGuiCustomTheme.h"
 using namespace std;
