@@ -296,7 +296,7 @@ int main()
 		EndDrawing();
 	}
 
-	rlImGuiShutdown();
+	rlImGuiShutdown(); 
 	CloseWindow();
 	return 0;
 }
