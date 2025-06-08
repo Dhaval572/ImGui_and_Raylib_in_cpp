@@ -176,12 +176,9 @@ void DrawDownloaderUI(char *urlBuffer, const char **formatNames, int numOfFormat
 
 	if (ImGui::Button("Download"))
 	{
-		string url = string(urlBuffer);
 		const char* format = formatNames[currentFormatIndex];
 
-		if (url.empty())
-			setStatus("Error: URL cannot be empty.", true);
-		else if (!commandExists("yt-dlp") && !isInstalling)
+		if (!commandExists("yt-dlp") && !isInstalling)
 		{
 			ensureYtDlpInstalled();
 			setStatus("Please wait while yt-dlp is being installed...");
@@ -206,7 +203,7 @@ void DrawDownloaderUI(char *urlBuffer, const char **formatNames, int numOfFormat
 				size_t lastSlash = fullPath.find_last_of("\\/");
 				string directory = (lastSlash != string::npos) ? fullPath.substr(0, lastSlash) : ".";
 
-				pendingUrl = url;
+				pendingUrl = urlBuffer;
 				pendingFormat = format;
 				pendingPath = directory;
 				showDownloadConfirmation = true;
