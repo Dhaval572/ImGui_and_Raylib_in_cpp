@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.10)
-project(rlImgui_template)
+cmake_minimum_required(VERSION 3.27)
+project(Sprite_sheet_cutter)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,20 +24,22 @@ file(GLOB PROJECT_SRC_CPP "src/*.cpp")
 # rlImGui and ImGui sources
 set(RLIMGUI_SRC rlImGui/rlImGui.cpp)
 set(IMGUI_SRC imgui/imgui.cpp imgui/imgui_draw.cpp imgui/imgui_tables.cpp imgui/imgui_widgets.cpp imgui/imgui_demo.cpp)
+set(TINYFILEDIALOGS tinyfiledialogs/tinyfiledialogs.c)
 
-# Copy assets to the build directory if the directory exists
+# Copy assets to the build directory
 if(EXISTS "${CMAKE_SOURCE_DIR}/assets")
     file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR})
 endif()
 
 # Create executable
-add_executable(main ${PROJECT_SRC_CPP} ${RLIMGUI_SRC} ${IMGUI_SRC})
+add_executable(main ${PROJECT_SRC_CPP} ${RLIMGUI_SRC} ${IMGUI_SRC} ${TINYFILEDIALOGS})
 
 # Add include directories — this is what lets you include .hpp/.h files
 target_include_directories(main PRIVATE 
     ${raylib_SOURCE_DIR}/src 
     ${CMAKE_SOURCE_DIR}/imgui 
     ${CMAKE_SOURCE_DIR}/rlImGui 
+    ${CMAKE_SOURCE_DIR}/tinyfiledialogs
     ${CMAKE_SOURCE_DIR}/src  # <-- This is what includes your .h/.hpp headers!
 )
 

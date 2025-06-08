@@ -1,53 +1,52 @@
-// Very simplest calculator Demo
+// Demo code
 #include <rlImGui.h>
 #include <imgui.h>
 #include "ImGuiCustomTheme.h"
+#include "tinyfiledialogs.h"
 
 int main()
 {
-    InitWindow(800, 600, "raylib + ImGui Demo");
+	InitWindow(800, 600, "raylib + ImGui Example");
 
-    SetTargetFPS(60);
-    rlImGuiSetup(true);
-    ImCustomTheme("assets/Fonts/Roboto-Regular.ttf");
+	SetTargetFPS(60);
+	rlImGuiSetup(true);
+	ImCustomTheme();
 
-    while (!WindowShouldClose())
-    {
-        BeginDrawing();
-        ClearBackground(DARKGRAY);
+	char selectedFile[1024] = "";
+	while (!WindowShouldClose())
+	{
+		BeginDrawing();
+		ClearBackground(DARKGRAY);
+		rlImGuiBegin();
 
-        rlImGuiBegin();
+		if (ImGui::Button("Open File Dialog"))
+		{
+			const char *filterPatterns[] = {"*.png", "*.jpg", "*.jpeg"};
+			const char *file = tinyfd_openFileDialog(
+				"Select an Image",
+				"",
+				3,
+				filterPatterns,
+				"Image files",
+				0);
 
-        static double num1 = 0;
-        static double num2 = 0;
-        static double result = 0;
+			if (file)
+			{
+				strncpy(selectedFile, file, sizeof(selectedFile));
+				selectedFile[sizeof(selectedFile) - 1] = '\0';
+			}
+		}
 
-        ImGui::Begin("Calculator");
+		if (selectedFile[0] != '\0')
+		{
+			ImGui::Text("Selected File: %s", selectedFile);
+		}
 
-        ImGui::InputDouble("Number 1", &num1);
-        ImGui::InputDouble("Number 2", &num2);
+		rlImGuiEnd();
+		EndDrawing();
+	}
 
-        if (ImGui::Button("Add"))
-            result = num1 + num2;
-
-        if (ImGui::Button("Substract"))
-            result = num1 - num2;
-
-        if (ImGui::Button("Divide"))
-            result = num1 / num2;
-
-        if (ImGui::Button("Multiply"))
-            result = num1 * num2;
-
-        ImGui::Text("Result: %f", result);
-
-        ImGui::End();
-
-        rlImGuiEnd();
-        EndDrawing();
-    }
-
-    rlImGuiShutdown();
-    CloseWindow();
-    return 0;
+	rlImGuiShutdown();
+	CloseWindow();
+	return 0;
 }
