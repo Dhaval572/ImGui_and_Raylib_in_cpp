@@ -159,7 +159,11 @@ void downloadVideo(const string &url, const string &format, const string &path)
 
 void DrawDownloaderUI(char *urlBuffer, const char **formatNames, int numOfFormats, int &currentFormatIndex)
 {
-	ImGui::Begin("YouTube Downloader");
+	ImGui::SetNextWindowPos(ImVec2((800 - 400) * 0.5f, (600 - 200) * 0.5f), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);
+
+	ImGui::Begin("YouTube Video Downloader", nullptr,
+				 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
 	ImGui::TextWrapped("Enter video URL:");
 	ImGui::InputText("##url", urlBuffer, 2048, ImGuiInputTextFlags_AllowTabInput);
@@ -173,7 +177,7 @@ void DrawDownloaderUI(char *urlBuffer, const char **formatNames, int numOfFormat
 
 	if (ImGui::Button("Download"))
 	{
-		const char* format = formatNames[currentFormatIndex];
+		const char *format = formatNames[currentFormatIndex];
 
 		if (!commandExists("yt-dlp") && !isInstalling)
 		{
@@ -183,12 +187,11 @@ void DrawDownloaderUI(char *urlBuffer, const char **formatNames, int numOfFormat
 		else
 		{
 			char const *selectedPath = tinyfd_saveFileDialog(
-                "Save video as",
-                format,
-                2,
-                NULL,
-                "NULL"
-            );
+				"Save video as",
+				format,
+				2,
+				NULL,
+				"NULL");
 
 			if (selectedPath)
 			{
@@ -293,7 +296,7 @@ int main()
 		EndDrawing();
 	}
 
-	rlImGuiShutdown(); 
+	rlImGuiShutdown();
 	CloseWindow();
 	return 0;
 }
