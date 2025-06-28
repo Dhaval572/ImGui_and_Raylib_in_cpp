@@ -169,9 +169,9 @@ void ParticleSystem::Draw()
 		Rectangle rect = {p.position.x - p.size/2, p.position.y - p.size/2, p.size, p.size};
 		DrawRectanglePro(rect, {p.size/2, p.size/2}, p.rotation * RAD2DEG, p.color);
 		*/
-
-		DrawEmitterShape();
 	}
+	
+	DrawEmitterShape();
 }
 
 void ParticleSystem::Clear()
