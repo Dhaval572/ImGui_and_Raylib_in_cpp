@@ -1,30 +1,43 @@
 #include <rlImGui.h>
-#include <imgui.h>
-#include "Particle_system.h"
 #include "ImGuiCustomTheme.h"
+#include "ParticleSystem.h"
 
 int main()
 {
-	InitWindow(800, 600, "raylib + ImGui Example");
-
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+	InitWindow(1200, 700, "Particle System Demo");
 	SetTargetFPS(60);
 	rlImGuiSetup(true);
 	ImCustomTheme();
- 
-	ParticleSystem ps({100, 100}, 10, true, BLUE);
+
+	ParticleSystem particleSystem;
+	bool showEmitterShape = true;
 
 	while (!WindowShouldClose())
 	{
-		ps.Update(GetFrameTime());
+		float deltaTime = GetFrameTime();
+
+		particleSystem.Update(deltaTime);
+
+		particleSystem.position = {100, 350};
+
 		BeginDrawing();
-		ClearBackground(DARKGRAY);
+		ClearBackground(BLACK);
+
+		particleSystem.Draw();
+		if (showEmitterShape)
+		{
+			particleSystem.DrawEmitterShape();
+		}
 		rlImGuiBegin();
-		ps.Draw();
+		DrawParticleSystemUI(particleSystem);
 		rlImGuiEnd();
+
 		EndDrawing();
 	}
 
 	rlImGuiShutdown();
 	CloseWindow();
+
 	return 0;
 }
