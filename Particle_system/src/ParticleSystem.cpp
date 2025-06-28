@@ -2,7 +2,6 @@
 
 ParticleSystem::ParticleSystem()
 	: maxParticles(1000),
-	  //   particles(),
 	  rng(std::random_device{}()),
 	  dist(0.0f, 1.0f),
 	  position({400, 300}),
@@ -12,8 +11,8 @@ ParticleSystem::ParticleSystem()
 	  velocity({0, -50}),
 	  velocityVariation({20, 20}),
 	  acceleration({0, 98}),
-	  startColor(PINK),
-	  endColor(WHITE),
+	  startColor(YELLOW),
+	  endColor(ORANGE),
 	  minLife(1.0f),
 	  maxLife(3.0f),
 	  minSize(2.0f),
@@ -114,10 +113,7 @@ void ParticleSystem::Update(float deltaTime)
 		p.position.x += p.velocity.x * deltaTime;
 		p.position.y += p.velocity.y * deltaTime;
 
-		// Update rotation
 		p.rotation += p.rotationSpeed * deltaTime;
-
-		// Update life
 		p.life -= deltaTime;
 
 		// Interpolate color
@@ -139,15 +135,17 @@ void ParticleSystem::Draw()
 		// Draw particle as a circle (you can customize this)
 		DrawCircleV(p.position, p.size, p.color);
 
+		/*
 		// Alternative: Draw as rotated rectangle
-		// Rectangle rect = {p.position.x - p.size/2, p.position.y - p.size/2, p.size, p.size};
-		// DrawRectanglePro(rect, {p.size/2, p.size/2}, p.rotation * RAD2DEG, p.color);
+		Rectangle rect = {p.position.x - p.size/2, p.position.y - p.size/2, p.size, p.size};
+		DrawRectanglePro(rect, {p.size/2, p.size/2}, p.rotation * RAD2DEG, p.color);
+		*/
 	}
 }
 
 void ParticleSystem::DrawEmitterShape()
 {
-	Color shapeColor = {255, 255, 0, 100}; // Yellow with transparency
+	Color shapeColor = {128, 128, 128, 100}; // Gray with transparency
 
 	switch (emitterType)
 	{
@@ -197,12 +195,11 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 	ImGui::Separator();
 
 	ImGui::Text("Emitter");
-	static constexpr char *emitterTypes[] = {"Point", "Line", "Circle", "Rectangle"};
+	static const char *emitterTypes[] = {"Point", "Line", "Circle", "Rectangle"};
 	int currentType = static_cast<int>(ps.emitterType);
-	if (ImGui::Combo("Type", &currentType, emitterTypes, 4))
-	{
-		ps.emitterType = (EmitterType)currentType;
-	}
+
+	ImGui::Combo("Type", &currentType, emitterTypes, IM_ARRAYSIZE(emitterTypes));
+	ps.emitterType = static_cast<EmitterType>(currentType);
 
 	ImGui::SliderFloat2("Position", (float *)&ps.position, 0, 800);
 
@@ -219,9 +216,8 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 		ImGui::SliderFloat2("Rectangle Size", (float *)&ps.rectSize, 10.0f, 300.0f);
 		break;
 	}
-
+	
 	ImGui::Separator();
-
 	// Particle properties
 	ImGui::Text("Particle Properties");
 	ImGui::SliderFloat2("Velocity", (float *)&ps.velocity, -200.0f, 200.0f);
@@ -233,19 +229,16 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 	ImGui::SliderFloat("Min Size", &ps.minSize, 1.0f, 20.0f);
 	ImGui::SliderFloat("Max Size", &ps.maxSize, 1.0f, 50.0f);
 	ImGui::SliderFloat("Rotation Speed", &ps.rotationSpeed, -10.0f, 10.0f);
-
+	
 	ImGui::Separator();
-	// Color settings
 	ImGui::Text("Colors");
 
-	// Start Color
 	ImVec4 startCol = ColorToImVec4(ps.startColor);
 	if (ImGui::ColorEdit4("Start Color", reinterpret_cast<float *>(&startCol)))
 	{
 		ps.startColor = ImVec4ToColor(startCol);
 	}
 
-	// End Color
 	ImVec4 endCol = ColorToImVec4(ps.endColor);
 	if (ImGui::ColorEdit4("End Color", reinterpret_cast<float *>(&endCol)))
 	{
@@ -259,6 +252,5 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 	}
 
 	ImGui::Text("Active Particles: %d", ps.GetParticleCount());
-
 	ImGui::End();
 }
