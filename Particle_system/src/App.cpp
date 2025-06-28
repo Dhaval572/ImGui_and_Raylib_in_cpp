@@ -11,7 +11,6 @@ void App::Init()
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
 	InitWindow(1200, 700, "Particle System Demo");
 	SetTargetFPS(60);
-
 	rlImGuiSetup(true);
 	ImCustomTheme();
 

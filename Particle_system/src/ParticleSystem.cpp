@@ -222,7 +222,6 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 	}
 
 	ImGui::Separator();
-	// Particle properties
 	ImGui::Text("Particle Properties");
 	ImGui::SliderFloat2("Velocity", (float *)&ps.velocity, -200.0f, 200.0f);
 	ImGui::SliderFloat2("Velocity Variation", (float *)&ps.velocityVariation, 0.0f, 100.0f);

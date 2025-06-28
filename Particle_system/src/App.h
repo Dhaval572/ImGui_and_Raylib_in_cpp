@@ -2,7 +2,6 @@
 #include <rlimGui.h>
 #include "ParticleSystem.h"
 #include "ImGuiCustomTheme.h"
-void DrawParticleSystemUI(ParticleSystem &ps);
 
 class App
 {
