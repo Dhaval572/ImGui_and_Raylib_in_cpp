@@ -116,30 +116,12 @@ void ParticleSystem::Update(float deltaTime)
 		p.rotation += p.rotationSpeed * deltaTime;
 		p.life -= deltaTime;
 
-		// Interpolate color
+		// This makes color transparent
 		float t = 1.0f - (p.life / p.maxLife);
-		p.color.r = (unsigned char)Clamp(startColor.r * (1 - t) + endColor.r * t, 0, 255);
-		p.color.g = (unsigned char)Clamp(startColor.g * (1 - t) + endColor.g * t, 0, 255);
-		p.color.b = (unsigned char)Clamp(startColor.b * (1 - t) + endColor.b * t, 0, 255);
-		p.color.a = (unsigned char)Clamp(255 * (p.life / p.maxLife), 0, 255);
-	}
-}
-
-void ParticleSystem::Draw()
-{
-	for (const auto &p : particles)
-	{
-		if (!p.active)
-			continue;
-
-		// Draw particle as a circle (you can customize this)
-		DrawCircleV(p.position, p.size, p.color);
-
-		/*
-		// Alternative: Draw as rotated rectangle
-		Rectangle rect = {p.position.x - p.size/2, p.position.y - p.size/2, p.size, p.size};
-		DrawRectanglePro(rect, {p.size/2, p.size/2}, p.rotation * RAD2DEG, p.color);
-		*/
+		p.color.r = Clamp(startColor.r * (1.0f - t) + endColor.r * t, 0, 255);
+		p.color.g = Clamp(startColor.g * (1.0f - t) + endColor.g * t, 0, 255);
+		p.color.b = Clamp(startColor.b * (1.0f - t) + endColor.b * t, 0, 255);
+		p.color.a = Clamp(255.0f * (p.life / p.maxLife), 0, 255);
 	}
 }
 
@@ -169,6 +151,26 @@ void ParticleSystem::DrawEmitterShape()
 			{position.x - rectSize.x / 2, position.y - rectSize.y / 2, rectSize.x, rectSize.y},
 			2, shapeColor);
 		break;
+	}
+}
+
+void ParticleSystem::Draw()
+{
+	for (const auto &p : particles)
+	{
+		if (!p.active)
+			continue;
+
+		// Draw particle as a circle (you can customize this)
+		DrawCircleV(p.position, p.size, p.color);
+
+		/*
+		// Alternative: Draw as rotated rectangle
+		Rectangle rect = {p.position.x - p.size/2, p.position.y - p.size/2, p.size, p.size};
+		DrawRectanglePro(rect, {p.size/2, p.size/2}, p.rotation * RAD2DEG, p.color);
+		*/
+
+		DrawEmitterShape();
 	}
 }
 
@@ -209,14 +211,16 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 	case LINE:
 		ImGui::SliderFloat("Line Length", &ps.lineLength, 10.0f, 300.0f);
 		break;
+
 	case CIRCLE:
 		ImGui::SliderFloat("Circle Radius", &ps.circleRadius, 10.0f, 200.0f);
 		break;
+
 	case RECTANGLE:
 		ImGui::SliderFloat2("Rectangle Size", (float *)&ps.rectSize, 10.0f, 300.0f);
 		break;
 	}
-	
+
 	ImGui::Separator();
 	// Particle properties
 	ImGui::Text("Particle Properties");
@@ -229,7 +233,7 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 	ImGui::SliderFloat("Min Size", &ps.minSize, 1.0f, 20.0f);
 	ImGui::SliderFloat("Max Size", &ps.maxSize, 1.0f, 50.0f);
 	ImGui::SliderFloat("Rotation Speed", &ps.rotationSpeed, -10.0f, 10.0f);
-	
+
 	ImGui::Separator();
 	ImGui::Text("Colors");
 

@@ -11,24 +11,18 @@ int main()
 	ImCustomTheme();
 
 	ParticleSystem particleSystem;
-	bool showEmitterShape = true;
 
+	particleSystem.position = {100, 350};
 	while (!WindowShouldClose())
 	{
 		float deltaTime = GetFrameTime();
-
 		particleSystem.Update(deltaTime);
-
-		particleSystem.position = {100, 350};
 
 		BeginDrawing();
 		ClearBackground(BLACK);
 
 		particleSystem.Draw();
-		if (showEmitterShape)
-		{
-			particleSystem.DrawEmitterShape();
-		}
+
 		rlImGuiBegin();
 		DrawParticleSystemUI(particleSystem);
 		rlImGuiEnd();

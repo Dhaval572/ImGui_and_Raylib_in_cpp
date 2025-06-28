@@ -38,9 +38,7 @@ private:
 	std::mt19937 rng;
 	std::uniform_real_distribution<float> dist;
 
-public:
 	// Emitter properties
-	Vector2 position;
 	EmitterType emitterType;
 	float emissionRate;
 	float emissionTimer;
@@ -65,17 +63,18 @@ public:
 	bool active;
 	int maxParticles;
 
-	// Constructor
-	ParticleSystem();
-
 	// Core methods
 	Vector2 GetEmissionPoint();
 	void EmitParticle();
-	void Update(float deltaTime);
-	void Draw();
 	void DrawEmitterShape();
 	void Clear();
 	int GetParticleCount() const;
-};
+	friend void DrawParticleSystemUI(ParticleSystem &ps);
 
-void DrawParticleSystemUI(ParticleSystem &ps);
+public:
+	Vector2 position;
+
+	ParticleSystem();
+	void Update(float deltaTime);
+	void Draw();
+};
