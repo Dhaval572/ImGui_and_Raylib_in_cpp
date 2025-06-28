@@ -196,9 +196,8 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 
 	ImGui::Separator();
 
-	// Emitter settings
 	ImGui::Text("Emitter");
-	const char *emitterTypes[] = {"Point", "Line", "Circle", "Rectangle"};
+	static constexpr char *emitterTypes[] = {"Point", "Line", "Circle", "Rectangle"};
 	int currentType = static_cast<int>(ps.emitterType);
 	if (ImGui::Combo("Type", &currentType, emitterTypes, 4))
 	{
