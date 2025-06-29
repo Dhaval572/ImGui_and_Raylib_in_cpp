@@ -11,7 +11,7 @@ ParticleSystem::ParticleSystem()
 	  velocity({0, -50}),
 	  velocityVariation({20, 20}),
 	  acceleration({0, 98}),
-	  startColor(YELLOW),
+	  startColor(RED),
 	  endColor(ORANGE),
 	  minLife(1.0f),
 	  maxLife(3.0f),
@@ -156,21 +156,49 @@ void ParticleSystem::DrawEmitterShape()
 
 void ParticleSystem::Draw()
 {
+
+	Rectangle drawArea =
+		{
+			GetScreenWidth() * 0.05f,
+			GetScreenHeight() * 0.1f,
+			GetScreenWidth() * 0.6f,
+			GetScreenHeight() * 0.8f};
+
+	DrawRectangleLinesEx(drawArea, 2, GRAY);
+	BeginScissorMode(drawArea.x, drawArea.y, drawArea.width, drawArea.height);
+
 	for (const auto &p : particles)
 	{
 		if (!p.active)
 			continue;
 
 		// Draw particle as a circle (you can customize this)
-		DrawCircleV(p.position, p.size, p.color);
+		// DrawCircleV(p.position, p.size, p.color);
 
-		/*
 		// Alternative: Draw as rotated rectangle
-		Rectangle rect = {p.position.x - p.size/2, p.position.y - p.size/2, p.size, p.size};
-		DrawRectanglePro(rect, {p.size/2, p.size/2}, p.rotation * RAD2DEG, p.color);
-		*/
+		// Rectangle rect = {p.position.x - p.size / 2, p.position.y - p.size / 2, p.size, p.size};
+		// DrawRectanglePro(rect, {p.size / 2, p.size / 2}, p.rotation * RAD2DEG, p.color);
+
+		// Draw as triangle
+		Vector2 vertices[3] = {
+			{0, -p.size / 2},
+			{-p.size / 2, p.size / 2},
+			{p.size / 2, p.size / 2},
+		};
+		for (int i = 0; i < 3; ++i)
+		{
+			Vector2 &v1 = vertices[i];
+			Vector2 &v2 = vertices[(i + 1) % 3];
+			DrawLineEx(
+				{p.position.x + v1.x * cosf(p.rotation) - v1.y * sinf(p.rotation),
+				 p.position.y + v1.x * sinf(p.rotation) + v1.y * cosf(p.rotation)},
+				{p.position.x + v2.x * cosf(p.rotation) - v2.y * sinf(p.rotation),
+				 p.position.y + v2.x * sinf(p.rotation) + v2.y * cosf(p.rotation)},
+				2, p.color);
+		}
 	}
-	
+
+	EndScissorMode();
 	DrawEmitterShape();
 }
 
@@ -187,7 +215,11 @@ int ParticleSystem::GetParticleCount() const
 // ImGui interface for particle system
 void DrawParticleSystemUI(ParticleSystem &ps)
 {
-	ImGui::Begin("Particle System Editor");
+	float screenW = static_cast<float>(GetScreenWidth());
+	float screenH = static_cast<float>(GetScreenHeight());
+	ImGui::SetNextWindowPos(ImVec2(screenW * 0.7f, screenH * 0.06f));
+	ImGui::SetNextWindowSize(ImVec2(screenW * 0.30f, screenH * 0.9f));
+	ImGui::Begin("Particle System Editor", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
 	// Basic controls
 	ImGui::Checkbox("Active", &ps.active);
