@@ -263,14 +263,21 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 
 	ImGui::Separator();
 	ImGui::Text("Particle Properties");
-	ImGui::SliderFloat2("Velocity", (float *)&ps.velocity, -200.0f, 200.0f);
-	ImGui::SliderFloat2("Velocity Variation", (float *)&ps.velocityVariation, 0.0f, 100.0f);
-	ImGui::SliderFloat2("Acceleration", (float *)&ps.acceleration, -500.0f, 500.0f);
+	ImGui::SliderFloat("Velocity X", &ps.velocity.x, -200.0f, 200.0f);
+	ImGui::SliderFloat("Velocity Y", &ps.velocity.y, -200.0f, 200.0f);
+
+	ImGui::SliderFloat("Velocity Variation X", &ps.velocityVariation.x, 0.0f, 100.0f);
+	ImGui::SliderFloat("Velocity Variation Y", &ps.velocityVariation.y, 0.0f, 100.0f);
+
+	ImGui::SliderFloat("Acceleration X", &ps.acceleration.x, -500.0f, 500.0f);
+	ImGui::SliderFloat("Acceleration Y", &ps.acceleration.y, -500.0f, 500.0f);
 
 	ImGui::SliderFloat("Min Life", &ps.minLife, 0.1f, 5.0f);
 	ImGui::SliderFloat("Max Life", &ps.maxLife, 0.1f, 10.0f);
+
 	ImGui::SliderFloat("Min Size", &ps.minSize, 1.0f, 20.0f);
 	ImGui::SliderFloat("Max Size", &ps.maxSize, 1.0f, 50.0f);
+	
 	ImGui::SliderFloat("Rotation Speed", &ps.rotationSpeed, -10.0f, 10.0f);
 
 	ImGui::Separator();
