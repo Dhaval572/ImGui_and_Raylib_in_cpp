@@ -132,7 +132,7 @@ void ParticleSystem::DrawEmitterShape()
 	switch (emitterType)
 	{
 	case POINT:
-		DrawCircleV(position, 5, shapeColor);
+		DrawCircleV(position, 3, shapeColor);
 		break;
 
 	case LINE:
@@ -148,7 +148,7 @@ void ParticleSystem::DrawEmitterShape()
 
 	case RECTANGLE:
 		DrawRectangleLinesEx(
-			{position.x - rectSize.x / 2, position.y - rectSize.y / 2, rectSize.x, rectSize.y},
+			{position.x - rectSize.x / 2, position.y - rectSize.y / 2, rectSize.x, rectSize.y},	
 			2, shapeColor);
 		break;
 	}
@@ -277,7 +277,7 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 
 	ImGui::SliderFloat("Min Size", &ps.minSize, 1.0f, 20.0f);
 	ImGui::SliderFloat("Max Size", &ps.maxSize, 1.0f, 50.0f);
-	
+
 	ImGui::SliderFloat("Rotation Speed", &ps.rotationSpeed, -10.0f, 10.0f);
 
 	ImGui::Separator();
