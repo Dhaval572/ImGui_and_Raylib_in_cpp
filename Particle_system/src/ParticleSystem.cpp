@@ -235,7 +235,15 @@ void DrawParticleSystemUI(ParticleSystem &ps)
 	ImGui::Combo("Type", &currentType, emitterTypes, IM_ARRAYSIZE(emitterTypes));
 	ps.emitterType = static_cast<EmitterType>(currentType);
 
-	ImGui::SliderFloat2("Position", (float *)&ps.position, 0, 800);
+	Rectangle drawArea = {
+		GetScreenWidth() * 0.05f,
+		GetScreenHeight() * 0.1f,
+		GetScreenWidth() * 0.6f,
+		GetScreenHeight() * 0.8f};
+
+	// Slider inputs for position
+	ImGui::SliderFloat("Emitter X", &ps.position.x, drawArea.x, drawArea.x + drawArea.width);
+	ImGui::SliderFloat("Emitter Y", &ps.position.y, drawArea.y, drawArea.y + drawArea.height);
 
 	// Emitter shape properties
 	switch (ps.emitterType)
