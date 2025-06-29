@@ -1,6 +1,0 @@
-*.exe
-*.dsym
-main
-build
-.vscode
-out
